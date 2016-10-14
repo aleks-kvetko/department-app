@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="by.alekskvetko.rest.dao.DepartmentDAO">
+    
+    <resultMap type="salaryView" id="salaryView">
+        <id column="id" property="id"/>
+        <result column="name" property="departmentName"/>
+		<result column="average_salary" property="averageSalary"/>
+    </resultMap>
+	
+	<select id="readAverageSalary" resultMap="salaryView" >
+         SELECT departments.id, departments.name, 
+		 (SELECT avg(salary) from ${db.schema}.employees where department_id=departments.id) as average_salary 
+		 from ${db.schema}.departments
+    </select>
+
+    
+    
+    
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="by.alekskvetko.rest.dao.EmployeeDAO">
+    
+    <resultMap type="employee" id="employee">
+        <id column="id" property="id"/>
+        <result column="full_name" property="fullName"/>
+        <result column="date_of_birth" property="dateOfBirth"/>
+        <result column="salary" property="salary"/>
+        <result column="department_id" property="departmentId"/>
+    </resultMap>
+	
+	<resultMap type="employeeInfoView" id="employeeInfoView">
+        <id column="id" property="id"/>
+        <result column="full_name" property="fullName"/>
+        <result column="date_of_birth" property="dateOfBirth"/>
+        <result column="salary" property="salary"/>
+        <result column="department_name" property="departmentName"/>
+    </resultMap>
+	
+	<insert id="createEmployee" parameterType="employee" keyProperty="id">
+        INSERT INTO ${db.schema}.employees
+          (full_name, date_of_birth, salary, department_id)
+        VALUES (#{fullName}, #{dateOfBirth}, #{salary}, #{departmentId})
+    </insert>
+
+    <select id="readEmployee" resultMap="employee" parameterType="long">
+         SELECT * 
+         FROM ${db.schema}.employees 
+         WHERE id = #{id}
+    </select>
+
+    <update id="updateEmployee" parameterType="employee">
+        UPDATE ${db.schema}.employees 
+        SET
+          full_name = #{fullName},
+          date_of_birth = #{dateOfBirth},
+          salary = #{salary},
+          department_id = #{departmentId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteEmployee" parameterType="long">
+        DELETE
+        FROM ${db.schema}.employees
+        WHERE id = #{id}
+    </delete>
+	
+	<select id="readAllEmployeeInfoViews" resultMap="employeeInfoView">
+         SELECT employees.id ,full_name, date_of_birth, salary, departments.name as department_name 
+		 FROM ${db.schema}.employees 
+		 left join ${db.schema}.departments on department_id=departments.id
+		 ORDER BY employees.id
+    </select>
+	
+	
+	<select id="readEmployeeInfoViewsByDepartmentId" resultMap="employeeInfoView" parameterType="long">
+         SELECT employees.id ,full_name, date_of_birth, salary, departments.name as department_name 
+		 FROM ${db.schema}.employees 
+		 left join ${db.schema}.departments on department_id=departments.id
+		 WHERE department_id=#{id} 
+    </select>
+	
+	<select id="searchEmployeeByDate" resultMap="employeeInfoView" parameterType="searchDateDTO">
+         SELECT employees.id ,full_name, date_of_birth, salary, departments.name as department_name 
+		 FROM ${db.schema}.employees 
+		 left join ${db.schema}.departments on department_id=departments.id
+		 <if test="startDate eq null and endDate eq null and certainDate neq null">
+		WHERE date_of_birth=#{certainDate}
+		</if>
+		<if test="startDate eq null and endDate neq null and certainDate eq null">
+		WHERE date_of_birth &lt;=#{endDate}
+		</if>
+		<if test="startDate neq null and endDate eq null and certainDate eq null">
+		WHERE date_of_birth >=#{startDate}
+		</if>
+		<if test="startDate neq null and endDate neq null and certainDate eq null">
+		WHERE date_of_birth >=#{startDate} AND date_of_birth &lt;=#{endDate}
+		</if>
+    </select>
+	
+    
+</mapper>

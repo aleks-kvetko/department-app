@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="by.alekskvetko.rest.dao.DepartmentDAO">
+    
+    <resultMap type="department" id="department">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+	
+    <insert id="createDepartment" parameterType="department" keyProperty="id">
+        INSERT INTO ${db.schema}.departments
+          (name)
+        VALUES (#{name})
+    </insert>
+	
+    <select id="readDepartment" resultMap="department" parameterType="long">
+         SELECT * 
+         FROM ${db.schema}.departments 
+         WHERE id = #{id}
+    </select>
+
+    <delete id="deleteDepartment" parameterType="long">
+        DELETE
+        FROM ${db.schema}.departments
+        WHERE id = #{id}
+    </delete>
+
+	<update id="updateDepartment" parameterType="department">
+        UPDATE ${db.schema}.departments 
+        SET
+          name = #{name}
+        WHERE id = #{id}
+    </update>
+	
+    <select id="readAllDepartments" resultMap="department">
+         SELECT * 
+         FROM ${db.schema}.departments 
+         ORDER BY id
+    </select>
+    
+    
+</mapper>
